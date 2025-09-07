@@ -1,0 +1,18 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")  
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id               String   @id @default(cuid())
+  stravaAthleteId  Int?     @unique   // id athlete từ Strava, để null cho đến khi connect
+  accessToken      String?           // token ngắn hạn
+  refreshToken     String?           // token để refresh access token
+  expiresAt        Int?              // epoch seconds thời điểm hết hạn access token
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
