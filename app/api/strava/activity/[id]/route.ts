@@ -27,10 +27,10 @@ async function getAccessToken() {
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  ctx: { params: Promise<{ id: string }> }
 ) {
   try {
-    const stravaId = params.id;
+    const stravaId = (await ctx.params).id;
     const token = await getAccessToken();
 
     // 1) Kéo chi tiết & lưu Activity

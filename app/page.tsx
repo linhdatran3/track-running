@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { fmtPace } from "@/lib/strava";
+import Link from "next/link";
 
 type Run = {
   id: string;
@@ -111,12 +112,9 @@ export default function Home() {
       {!data && !err && <div>Loading…</div>}
 
       {data && (
-        <ul className="space-y-3">
+        <div className="space-y-3">
           {data.map((run) => (
-            <li
-              key={run.id}
-              className="p-4 rounded-2xl border border-black/10 bg-black/5"
-            >
+            <Link href={`/run/${run.stravaId ?? run.id}`} key={run.id}>
               <div className="font-medium">{run.name}</div>
               <div className="text-sm opacity-80">
                 {new Date(run.start_local).toLocaleString()}
@@ -130,9 +128,9 @@ export default function Home() {
                   Device: {run.device ?? "—"}
                 </div>
               </div>
-            </li>
+            </Link>
           ))}
-        </ul>
+        </div>
       )}
     </main>
   );

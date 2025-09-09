@@ -20,6 +20,7 @@ export interface IActivityFromStrava {
   external_id?: string;
 }
 
+
 function isGarmin(a: IActivityFromStrava) {
   const d = (a?.device_name || "").toLowerCase();
   const ext = (a?.external_id || "").toLowerCase();
@@ -29,7 +30,7 @@ function isGarmin(a: IActivityFromStrava) {
 export async function upsertActivityFromStrava(a: IActivityFromStrava) {
   const stravaId = BigInt(a.id);
   const data = {
-    stravaId,
+    id: a.id,
     name: a.name ?? "",
     startLocal: new Date(a.start_date_local),
     startUtc: a.start_date ? new Date(a.start_date) : null,
@@ -46,11 +47,11 @@ export async function upsertActivityFromStrava(a: IActivityFromStrava) {
     deviceName: a.device_name ?? null,
     externalId: a.external_id ?? null,
     isGarmin: isGarmin(a),
-    rawJson: a,
+    rawJson: a as unknown as undefined,
   };
   await prisma.activity.upsert({
     where: { stravaId },
     update: data,
-    create: data,
+    create: { ...data, stravaId },
   });
 }
