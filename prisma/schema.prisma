@@ -1,0 +1,56 @@
+datasource db {
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")          // Accelerate/Data Proxy endpoint
+  directUrl         = env("DIRECT_URL")            // KẾT NỐI TRỰC TIẾP Postgres gốc (postgresql://…)
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id               String   @id @default(cuid())
+  stravaAthleteId  Int?     @unique   // id athlete từ Strava, để null cho đến khi connect
+  accessToken      String?           // token ngắn hạn
+  refreshToken     String?           // token để refresh access token
+  expiresAt        Int?              // epoch seconds thời điểm hết hạn access token
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model Activity {
+  id                 String   @id @default(cuid())
+  stravaId           BigInt   @unique              // ID Strava (lớn) → dùng BigInt
+  name               String
+  startLocal         DateTime
+  startUtc           DateTime?
+  distanceM          Int
+  movingTimeS        Int
+  elapsedTimeS       Int?
+  averageSpeed       Float?
+  maxSpeed           Float?
+  averageHeartrate   Float?
+  maxHeartrate       Float?
+  averageCadence     Float?
+  totalElevationGain Float?
+  sportType          String?
+  deviceName         String?
+  externalId         String?
+  isGarmin           Boolean  @default(false)
+  rawJson            Json?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  streams            ActivityStream[]
+}
+
+model ActivityStream {
+  id         String   @id @default(cuid())
+  activityId String
+  type       String   // e.g. "velocity_smooth", "heartrate", "distance", "time", "latlng"
+  data       Json     // lưu raw array (JSONB trong Postgres)
+  createdAt  DateTime @default(now())
+
+  activity   Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+}
