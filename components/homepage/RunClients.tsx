@@ -13,7 +13,7 @@ export default function RunsClient() {
   const onNotice = (msg?: string) => setNotice(msg || null);
 
   return (
-    <main className="max-w-3xl mx-auto p-6">
+    <div className="space-y-8">
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-semibold">Track Running Schedule</h1>
         <a
@@ -39,6 +39,6 @@ export default function RunsClient() {
       )}
 
       <ActivitiesList onError={onError} />
-    </main>
+    </div>
   );
 }

@@ -8,6 +8,7 @@ export const apiEndpoint = {
   activities_id: "/api/activities/{id}",
   activities_id_streams: "/api/activities/{id}/streams",
   sync: "/api/strava/sync",
+  summary: "/api/summary",
 } as const;
 
 export type ApiEndpointKey = keyof typeof apiEndpoint;

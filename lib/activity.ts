@@ -20,7 +20,6 @@ export interface IActivityFromStrava {
   external_id?: string;
 }
 
-
 function isGarmin(a: IActivityFromStrava) {
   const d = (a?.device_name || "").toLowerCase();
   const ext = (a?.external_id || "").toLowerCase();
@@ -30,7 +29,7 @@ function isGarmin(a: IActivityFromStrava) {
 export async function upsertActivityFromStrava(a: IActivityFromStrava) {
   const stravaId = BigInt(a.id);
   const data = {
-    id: a.id,
+    id: a.id.toString(),
     name: a.name ?? "",
     startLocal: new Date(a.start_date_local),
     startUtc: a.start_date ? new Date(a.start_date) : null,
