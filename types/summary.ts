@@ -11,3 +11,12 @@ export type Summary = {
     weekStartISO: string;
   }[];
 };
+
+export type TodayWeekSummary = {
+  today: { distanceKm: number; movingTimeMin: number; avgPace: number | null };
+  thisWeek: {
+    distanceKm: number;
+    movingTimeMin: number;
+    avgPace: number | null;
+  };
+};

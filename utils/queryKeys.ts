@@ -4,4 +4,5 @@ export const queryKeys = {
   activitiesStream: (id?: string) => ["activities", id, "streams"] as const,
   run: (id: string) => ["run", id] as const,
   summary: () => ["summary"] as const,
+  todayWeekSummary: () => ["summary", "today-week"],
 } as const;

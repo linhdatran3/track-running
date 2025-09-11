@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { startOfWeek, endOfWeek } from "date-fns";
 import { prisma } from "@/lib/db";
 import { Activity } from "@prisma/client";
+import { TodayWeekSummary } from "@/types/summary";
 
 function pace(distanceM: number, movingS: number) {
   if (!distanceM) return null;
@@ -33,8 +34,9 @@ export async function GET() {
     };
   }
 
-  return NextResponse.json({
+  const res: TodayWeekSummary = {
     today: sum(todayActs),
     thisWeek: sum(weekActs),
-  });
+  };
+  return NextResponse.json(res);
 }
