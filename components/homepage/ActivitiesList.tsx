@@ -22,7 +22,11 @@ export default function ActivitiesList({
   return (
     <div className="space-y-3">
       {runs.map((run) => (
-        <Link href={`/run/${run.stravaId ?? run.id}`} key={run.id}>
+        <Link
+          href={`/run/${run.stravaId ?? run.id}`}
+          key={run.id}
+          className="block p-4 border rounded-2xl h-full"
+        >
           <div className="font-medium">{run.name}</div>
           <div className="text-sm opacity-80">
             {new Date(run.start_local).toLocaleString()}

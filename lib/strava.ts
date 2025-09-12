@@ -1,10 +1,19 @@
+import { prisma } from "./db";
+
 export type TokenResp = {
   access_token: string;
   refresh_token: string;
   expires_at: number; // epoch seconds
-  athlete?: { id: number };
+  athlete?: Athlete;
 };
 
+export type Athlete = {
+  id: number;
+  username?: string;
+  firstname?: string;
+  lastname?: string;
+  profilePhoto?: string;
+};
 export async function exchangeToken(code: string): Promise<TokenResp> {
   const r = await fetch("https://www.strava.com/oauth/token", {
     method: "POST",
@@ -48,6 +57,46 @@ export async function refreshAccessToken(
   });
   if (!r.ok) throw new Error(`refreshAccessToken failed: ${r.status}`);
   return (await r.json()) as TokenResp;
+}
+
+export async function getValidAccessTokenFromReq(req: Request) {
+  // Extract cookie: compatible with Next.js server handlers (req: Request)
+  const cookie = req.headers.get("cookie") ?? "";
+  const match = cookie.match(/session=([^;]+)/);
+  const sessionToken = match ? match[1] : null;
+  if (!sessionToken) throw new Error("Not authenticated");
+
+  // Find session + user
+  const session = await prisma.session.findUnique({
+    where: { token: sessionToken },
+    include: { user: true },
+  });
+  if (!session) throw new Error("Session not found");
+  if (session.expiresAt < new Date()) {
+    await prisma.session.delete({ where: { id: session.id } });
+    throw new Error("Session expired");
+  }
+
+  const user = session.user;
+  if (!user || !user.refreshToken) throw new Error("User missing tokens");
+
+  const now = Math.floor(Date.now() / 1000);
+  if (!user.expiresAt || user.expiresAt <= now) {
+    // refresh
+    const tok = await refreshAccessToken(user.refreshToken);
+    // update DB
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        accessToken: tok.access_token,
+        refreshToken: tok.refresh_token,
+        expiresAt: tok.expires_at,
+      },
+    });
+    return tok.access_token;
+  }
+  // still valid
+  return user.accessToken!;
 }
 
 export async function getActivities(

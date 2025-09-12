@@ -1,7 +1,7 @@
 datasource db {
   provider          = "postgresql"
-  url               = env("DATABASE_URL")          // Accelerate/Data Proxy endpoint
-  directUrl         = env("DIRECT_URL")            // KẾT NỐI TRỰC TIẾP Postgres gốc (postgresql://…)
+  url               = env("DATABASE_URL") // Accelerate/Data Proxy endpoint
+  directUrl         = env("DIRECT_URL") // KẾT NỐI TRỰC TIẾP Postgres gốc (postgresql://…)
   shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
@@ -10,18 +10,34 @@ generator client {
 }
 
 model User {
-  id               String   @id @default(cuid())
-  stravaAthleteId  Int?     @unique   // id athlete từ Strava, để null cho đến khi connect
-  accessToken      String?           // token ngắn hạn
-  refreshToken     String?           // token để refresh access token
-  expiresAt        Int?              // epoch seconds thời điểm hết hạn access token
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  id              String     @id @default(cuid())
+  stravaAthleteId Int?       @unique // id athlete từ Strava, để null cho đến khi connect
+  accessToken     String? // token ngắn hạn
+  refreshToken    String? // token để refresh access token
+  expiresAt       Int? // epoch seconds thời điểm hết hạn access token
+  username        String?
+  firstname       String?
+  lastname        String?
+  profilePhoto    String?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  sessions        Session[]
+  activities      Activity[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Activity {
-  id                 String   @id @default(cuid())
-  stravaId           BigInt   @unique              // ID Strava (lớn) → dùng BigInt
+  id                 String    @id @default(cuid())
+  stravaId           BigInt    @unique // ID Strava (lớn) → dùng BigInt
   name               String
   startLocal         DateTime
   startUtc           DateTime?
@@ -37,20 +53,22 @@ model Activity {
   sportType          String?
   deviceName         String?
   externalId         String?
-  isGarmin           Boolean  @default(false)
+  isGarmin           Boolean   @default(false)
   rawJson            Json?
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
 
-  streams            ActivityStream[]
+  streams ActivityStream[]
+  User    User?            @relation(fields: [userId], references: [id])
+  userId  String?
 }
 
 model ActivityStream {
   id         String   @id @default(cuid())
   activityId String
-  type       String   // e.g. "velocity_smooth", "heartrate", "distance", "time", "latlng"
-  data       Json     // lưu raw array (JSONB trong Postgres)
+  type       String // e.g. "velocity_smooth", "heartrate", "distance", "time", "latlng"
+  data       Json // lưu raw array (JSONB trong Postgres)
   createdAt  DateTime @default(now())
 
-  activity   Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  activity Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
 }
