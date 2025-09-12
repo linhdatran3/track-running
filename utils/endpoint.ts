@@ -10,6 +10,8 @@ export const apiEndpoint = {
   sync: "/api/strava/sync",
   summary: "/api/summary",
   todayWeekSummary: "/api/summary/today-week",
+  me: "/api/me",
+  strava_auth: "/api/strava/authorize",
 } as const;
 
 export type ApiEndpointKey = keyof typeof apiEndpoint;
