@@ -10,7 +10,6 @@ import {
   prefetchSummaries,
   prefetchTodayWeekSummary,
 } from "@/services/summary";
-import TodayWeekSummarySection from "@/components/homepage/TodayWeekSummary";
 
 export default async function Page() {
   const qc = new QueryClient();
@@ -22,9 +21,10 @@ export default async function Page() {
 
   return (
     <HydrationBoundary state={dehydrate(qc)}>
-      <DashboardRunning />
-      <TodayWeekSummarySection />
-      <RunsClient />
+      <div className="flex w-full justify-between gap-8">
+        <DashboardRunning />
+        <RunsClient className="w-full border-l border-foreground p-4" />
+      </div>
     </HydrationBoundary>
   );
 }
