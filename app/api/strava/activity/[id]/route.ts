@@ -1,29 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { refreshAccessToken } from "@/lib/strava";
+import { getValidAccessTokenFromReq } from "@/lib/strava";
 import { upsertActivityFromStrava } from "@/lib/activity";
-
-async function getAccessToken() {
-  const u = await prisma.user.findFirst({
-    where: { stravaAthleteId: { not: null } },
-  });
-  if (!u?.refreshToken) throw new Error("No connected Strava user");
-  let token = u.accessToken || "";
-  const now = Math.floor(Date.now() / 1000);
-  if (!u.expiresAt || u.expiresAt <= now) {
-    const refreshed = await refreshAccessToken(u.refreshToken);
-    await prisma.user.update({
-      where: { id: u.id },
-      data: {
-        accessToken: refreshed.access_token,
-        refreshToken: refreshed.refresh_token,
-        expiresAt: refreshed.expires_at,
-      },
-    });
-    token = refreshed.access_token;
-  }
-  return token;
-}
 
 export async function GET(
   req: NextRequest,
@@ -31,7 +9,8 @@ export async function GET(
 ) {
   try {
     const stravaId = (await ctx.params).id;
-    const token = await getAccessToken();
+    // const token = await getAccessToken();
+    const token = await getValidAccessTokenFromReq(req);
 
     // 1) Kéo chi tiết & lưu Activity
     const detRes = await fetch(
@@ -40,8 +19,10 @@ export async function GET(
         headers: { Authorization: `Bearer ${token}` },
       }
     );
+
     if (!detRes.ok) throw new Error(`detail failed: ${detRes.status}`);
     const detail = await detRes.json();
+
     await upsertActivityFromStrava(detail);
 
     // 2) Kéo streams

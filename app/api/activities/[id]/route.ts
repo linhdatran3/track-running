@@ -9,6 +9,7 @@ export async function GET(
   const { id } = await ctx.params;
   const token = _req.cookies.get("session")?.value ?? null;
   const user = await getUserBySessionToken(token);
+  console.log(user);
   if (!user)
     return NextResponse.json({ error: "Unauthenticated" }, { status: 401 });
 
@@ -29,9 +30,9 @@ export async function GET(
     },
   });
   if (!act) return NextResponse.json({ error: "Not found" }, { status: 404 });
-  if (act.stravaId !== BigInt(user?.stravaAthleteId ?? 0)) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
+  // if (act.stravaId !== BigInt(user?.stravaAthleteId ?? 0)) {
+  //   return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  // }
 
   return NextResponse.json({
     id: act.id,

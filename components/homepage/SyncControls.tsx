@@ -1,5 +1,5 @@
 "use client";
-import { useSyncStrava } from "@/hooks/useSyncStrava";
+import { useActivitiesSync } from "@/hooks/useSyncStrava";
 
 type Props = {
   pages: number;
@@ -18,7 +18,7 @@ export default function SyncControls({
   onSuccess,
   onError,
 }: Props) {
-  const { mutate: syncStrava, isPending } = useSyncStrava({
+  const { mutate: syncActivities, isPending } = useActivitiesSync({
     onSuccess,
     onError,
   });
@@ -26,7 +26,7 @@ export default function SyncControls({
   return (
     <div className="mb-4 flex flex-wrap items-center gap-2">
       <button
-        onClick={() => syncStrava({ pages, perPage })}
+        onClick={() => syncActivities({ pages, perPage })}
         disabled={isPending}
         className="px-3 py-2 rounded-lg border border-black/10 hover:bg-black/5 disabled:opacity-60"
       >

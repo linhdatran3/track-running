@@ -12,6 +12,7 @@ export class ApiError extends Error {
 export interface FetchError {
   name?: string;
   message?: string;
+  status?: number;
 }
 
 export async function fetchJSON<T>(

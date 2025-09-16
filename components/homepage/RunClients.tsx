@@ -3,7 +3,7 @@ import ActivitiesList from "./ActivitiesList";
 import { useState } from "react";
 import SyncControls from "./SyncControls";
 
-export default function RunsClient() {
+export default function RunsClient({ className }: { className?: string }) {
   const [notice, setNotice] = useState<string | null>(null);
   const [pages, setPages] = useState(3);
   const [perPage, setPerPage] = useState(50);
@@ -13,7 +13,7 @@ export default function RunsClient() {
   const onNotice = (msg?: string) => setNotice(msg || null);
 
   return (
-    <div className="space-y-8">
+    <div className={`space-y-8 ${className}`}>
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-semibold">Track Running Schedule</h1>
         <a

@@ -2,7 +2,6 @@
 import { fmtPace } from "@/lib/strava";
 import { summaries } from "@/services/summary";
 import { useQuery } from "@tanstack/react-query";
-import Link from "next/link";
 import {
   Bar,
   BarChart,
@@ -11,12 +10,14 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import TodayWeekSummarySection from "./TodayWeekSummary";
+import ConnectedWearables from "./ConnectedWearables";
 
 const DashboardRunning = () => {
   const { data: summary, isLoading } = useQuery(summaries());
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 w-full">
       <h2 className="text-2xl font-semibold">Running Dashboard</h2>
 
       {!isLoading && summary && (
@@ -41,6 +42,9 @@ const DashboardRunning = () => {
               </div>
             </div>
           </div>
+          <TodayWeekSummarySection />
+
+          <ConnectedWearables />
 
           {/* Weekly chart */}
           <div className="p-4 rounded-xl border bg-card text-foreground shadow">
@@ -61,14 +65,14 @@ const DashboardRunning = () => {
           </div>
 
           {/* Link to runs list */}
-          <div>
+          {/* <div>
             <Link
               href="/runs"
               className="px-4 py-2 rounded-lg border hover:bg-black/5"
             >
               View all runs
             </Link>
-          </div>
+          </div> */}
         </>
       )}
     </div>

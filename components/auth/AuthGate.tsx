@@ -21,7 +21,7 @@ export default function AuthGate() {
   }
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="bg-[#1c1717] h-screen py-4 md:w-[240px]">
       <div>
         <div className="text-sm font-medium">
           {userData.firstname ?? userData.username}
