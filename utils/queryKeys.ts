@@ -6,4 +6,5 @@ export const queryKeys = {
   summary: () => ["summary"] as const,
   todayWeekSummary: () => ["summary", "today-week"] as const,
   me: () => ["me"] as const,
+  wearables: () => ["wearables"] as const,
 } as const;
