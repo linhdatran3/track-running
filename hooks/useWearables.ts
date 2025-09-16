@@ -1,7 +1,7 @@
 import { getWearables, postWearablesSync } from "@/services/wearables";
 import { SyncOptions } from "@/types/base";
 import { SyncReq } from "@/types/run";
-import { Wearable, WearableSyncRes } from "@/types/wearable";
+import { WearableRes, WearableSyncRes } from "@/types/wearable";
 import { FetchError } from "@/utils/fetcher";
 import { queryKeys } from "@/utils/queryKeys";
 import {
@@ -11,9 +11,9 @@ import {
   UseQueryOptions,
 } from "@tanstack/react-query";
 
-export function useGetWearables(options?: UseQueryOptions<Wearable[]>) {
+export function useGetWearables(options?: UseQueryOptions<WearableRes>) {
   const base = getWearables();
-  return useQuery<Wearable[]>({
+  return useQuery<WearableRes>({
     ...base,
     ...options,
   });

@@ -18,6 +18,20 @@ export async function GET(req: NextRequest) {
       take: 1000,
     });
 
+    const logs = await prisma.syncLog.findMany({
+      where: { userId: user.id },
+      orderBy: { createdAt: "desc" },
+      take: 3,
+    });
+
+    let syncLog = undefined;
+    for (const log of logs) {
+      if (log.type === "wearables_sync") {
+        syncLog = log;
+        break;
+      }
+    }
+
     const counts: Record<string, number> = {};
     for (const a of activities) {
       if (a?.deviceName) {
@@ -31,7 +45,7 @@ export async function GET(req: NextRequest) {
       count,
     }));
 
-    return NextResponse.json(devices);
+    return NextResponse.json({ devices, syncLog });
   } catch (e: unknown) {
     return NextResponse.json(
       { error: (e as FetchError).message },

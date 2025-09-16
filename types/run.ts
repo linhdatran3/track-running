@@ -9,6 +9,8 @@ export type Run = {
   avg_hr: number | null;
   device?: string | null;
   elev_gain_m?: number | null;
+  average_speed: number | null;
+  sport_type: string | null;
 };
 
 export type SyncReq = { pages: number; perPage: number };

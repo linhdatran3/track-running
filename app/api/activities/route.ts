@@ -16,6 +16,8 @@ export async function GET(req: NextRequest) {
         movingTimeS: true,
         averageHeartrate: true,
         deviceName: true,
+        averageSpeed: true,
+        sportType: true,
       },
     });
 
@@ -28,6 +30,8 @@ export async function GET(req: NextRequest) {
       moving_time_min: r.movingTimeS / 60,
       avg_hr: r.averageHeartrate,
       device: r.deviceName,
+      average_speed: r.averageSpeed,
+      sport_type: r.sportType,
     }));
     return NextResponse.json(list);
   } catch (e: unknown) {

@@ -1,4 +1,6 @@
-export type Wearable = {
+import { SyncLog } from "@prisma/client";
+
+export type Device = {
   deviceName: string;
   count: number; //number of activities
   img?: string;
@@ -7,5 +9,10 @@ export type Wearable = {
 export type WearableSyncRes = {
   ok: boolean;
   saved: number;
-  devices: Wearable[];
+  devices: Device[];
+};
+
+export type WearableRes = {
+  syncLog: SyncLog;
+  devices: Device[];
 };

@@ -10,6 +10,7 @@ import {
   prefetchSummaries,
   prefetchTodayWeekSummary,
 } from "@/services/summary";
+import ConnectedWearables from "@/components/homepage/ConnectedWearables";
 
 export default async function Page() {
   const qc = new QueryClient();
@@ -22,8 +23,12 @@ export default async function Page() {
   return (
     <HydrationBoundary state={dehydrate(qc)}>
       <div className="flex w-full justify-between gap-8">
-        <DashboardRunning />
-        <RunsClient className="w-full border-l border-foreground p-4" />
+        <div className="w-full">
+          <DashboardRunning />
+          <RunsClient className="w-full border-l border-foreground p-4" />
+        </div>
+
+        <ConnectedWearables />
       </div>
     </HydrationBoundary>
   );

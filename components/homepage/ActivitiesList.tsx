@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { fmtPace } from "@/lib/strava";
+import { calcPaceMinPerKm, fmtPace } from "@/lib/strava";
 import { FetchError } from "@/utils/fetcher";
 import { useActivities } from "@/hooks/useActivities";
 
@@ -34,8 +34,13 @@ export default function ActivitiesList({
           <div className="mt-2 grid grid-cols-2 gap-2 text-sm">
             <div>Distance: {run.distance_km.toFixed(2)} km</div>
             <div>Time: {run.moving_time_min.toFixed(1)} phút</div>
-            <div>Pace: {fmtPace?.(run.pace_min_per_km ?? null)}</div>
-            <div>Avg HR: {run.avg_hr ?? "—"}</div>
+            <div>
+              Pace:{" "}
+              {fmtPace?.(
+                calcPaceMinPerKm(run.moving_time_min, run.distance_km) ?? null
+              )}
+            </div>
+            <div>Type: {run.sport_type ?? "—"}</div>
             <div className="col-span-2 opacity-70">
               Device: {run.device ?? "—"}
             </div>

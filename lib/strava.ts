@@ -99,6 +99,51 @@ export async function getValidAccessTokenFromReq(req: Request) {
   return user.accessToken!;
 }
 
+export async function getValidUserFromReq(req: Request) {
+  // Extract cookie: compatible with Next.js server handlers (req: Request)
+  const cookie = req.headers.get("cookie") ?? "";
+  const match = cookie.match(/session=([^;]+)/);
+  const sessionToken = match ? match[1] : null;
+  if (!sessionToken) throw new Error("Not authenticated");
+
+  // Find session + user
+  const session = await prisma.session.findUnique({
+    where: { token: sessionToken },
+    include: { user: true },
+  });
+  if (!session) throw new Error("Session not found");
+  if (session.expiresAt < new Date()) {
+    await prisma.session.delete({ where: { id: session.id } });
+    throw new Error("Session expired");
+  }
+
+  const user = session.user;
+  if (!user || !user.refreshToken) throw new Error("User missing tokens");
+
+  const now = Math.floor(Date.now() / 1000);
+  if (!user.expiresAt || user.expiresAt <= now) {
+    // refresh
+    const tok = await refreshAccessToken(user.refreshToken);
+    // update DB
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        accessToken: tok.access_token,
+        refreshToken: tok.refresh_token,
+        expiresAt: tok.expires_at,
+      },
+    });
+    return {
+      ...user,
+      accessToken: tok.access_token,
+      refreshToken: tok.refresh_token,
+      expiresAt: tok.expires_at,
+    };
+  }
+  // still valid
+  return user!;
+}
+
 export async function getActivities(
   accessToken: string,
   page = 1,
@@ -116,14 +161,15 @@ export async function getActivities(
 }
 
 export function isRun(a: { sport_type: string; type: string }) {
-  return (
-    a?.sport_type === "Run" || a?.type === "Run" || a?.sport_type === "TrailRun"
-  );
+  // return (
+  //   a?.sport_type === "Run" || a?.type === "Run" || a?.sport_type === "TrailRun"
+  // );
+  return true;
 }
 
-export function calcPaceMinPerKm(movingTimeSec?: number, distanceM?: number) {
-  if (!movingTimeSec || !distanceM) return null;
-  const minPerKm = movingTimeSec / (distanceM / 1000) / 60;
+export function calcPaceMinPerKm(movingTimeMin?: number, distanceKm?: number) {
+  if (!movingTimeMin || !distanceKm) return null;
+  const minPerKm = movingTimeMin / distanceKm;
   return Number.isFinite(minPerKm) ? minPerKm : null;
 }
 

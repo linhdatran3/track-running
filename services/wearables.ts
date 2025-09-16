@@ -1,4 +1,4 @@
-import { Wearable, WearableSyncRes } from "@/types/wearable";
+import { WearableRes, WearableSyncRes } from "@/types/wearable";
 import { apiEndpoint } from "@/utils/endpoint";
 import { fetchJSON } from "@/utils/fetcher";
 import { queryKeys } from "@/utils/queryKeys";
@@ -9,7 +9,7 @@ export function getWearables() {
   return {
     queryKey: queryKeys.wearables(),
     queryFn: ({ signal }: { signal?: AbortSignal }) =>
-      fetchJSON<Wearable[]>(apiEndpoint.wearables, { signal }),
+      fetchJSON<WearableRes>(apiEndpoint.wearables, { signal }),
   } as const;
 }
 

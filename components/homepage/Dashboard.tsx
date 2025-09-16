@@ -11,8 +11,8 @@ import {
   YAxis,
 } from "recharts";
 import TodayWeekSummarySection from "./TodayWeekSummary";
-import ConnectedWearables from "./ConnectedWearables";
 
+//TODO: skeleton
 const DashboardRunning = () => {
   const { data: summary, isLoading } = useQuery(summaries());
 
@@ -43,8 +43,6 @@ const DashboardRunning = () => {
             </div>
           </div>
           <TodayWeekSummarySection />
-
-          <ConnectedWearables />
 
           {/* Weekly chart */}
           <div className="p-4 rounded-xl border bg-card text-foreground shadow">

@@ -10,8 +10,8 @@ generator client {
 }
 
 model User {
-  id              String     @id @default(cuid())
-  stravaAthleteId Int?       @unique // id athlete từ Strava, để null cho đến khi connect
+  id              String    @id @default(cuid())
+  stravaAthleteId Int?      @unique // id athlete từ Strava, để null cho đến khi connect
   accessToken     String? // token ngắn hạn
   refreshToken    String? // token để refresh access token
   expiresAt       Int? // epoch seconds thời điểm hết hạn access token
@@ -19,10 +19,13 @@ model User {
   firstname       String?
   lastname        String?
   profilePhoto    String?
-  createdAt       DateTime   @default(now())
-  updatedAt       DateTime   @updatedAt
-  sessions        Session[]
-  activities      Activity[]
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  lastSyncedAt    DateTime?
+
+  sessions   Session[]
+  activities Activity[]
+  syncLogs   SyncLog[]
 }
 
 model Session {
@@ -71,4 +74,14 @@ model ActivityStream {
   createdAt  DateTime @default(now())
 
   activity Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+}
+
+model SyncLog {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String // e.g., "wearables_sync", "full_sync", "webhook_detail"
+  status    String // e.g., "ok","partial","failed"
+  detail    Json? // optional info like { saved: X, queued: Y }
+  createdAt DateTime @default(now())
 }

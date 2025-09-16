@@ -16,12 +16,12 @@ export default function RunsClient({ className }: { className?: string }) {
     <div className={`space-y-8 ${className}`}>
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-semibold">Track Running Schedule</h1>
-        <a
+        {/* <a
           href="/api/strava/authorize"
           className="px-4 py-2 rounded-xl border border-black/10 hover:bg-black/5"
         >
           Connect Strava
-        </a>
+        </a> */}
       </div>
 
       <SyncControls

@@ -1,10 +1,11 @@
 // app/api/wearables/sync/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { upsertActivityFromStrava } from "@/lib/activity";
-import { getValidAccessTokenFromReq, isRun } from "@/lib/strava";
+import { getValidUserFromReq, isRun } from "@/lib/strava";
 import { prisma } from "@/lib/db";
 import { FetchError } from "@/utils/fetcher";
-import { WearableSyncRes } from "@/types/wearable";
+import { Device, WearableSyncRes } from "@/types/wearable";
+import { SyncLogReq } from "@/types/sync";
 
 /**
  * Sync wearables: for each page we:
@@ -18,7 +19,7 @@ import { WearableSyncRes } from "@/types/wearable";
 
 export async function POST(req: NextRequest) {
   try {
-    const accessToken = await getValidAccessTokenFromReq(req);
+    const { id, accessToken } = await getValidUserFromReq(req);
     // if (!user) return NextResponse.json({ error: "Unauthenticated" }, { status: 401 });
 
     const body = await req.json().catch(() => ({}));
@@ -103,6 +104,22 @@ export async function POST(req: NextRequest) {
       deviceName,
       count,
     }));
+
+    // AFTER successful run (or even partial), update lastSyncedAt and create SyncLog
+    const now = new Date();
+    await prisma.user.update({ where: { id }, data: { lastSyncedAt: now } });
+
+    const syncData: SyncLogReq<Device[]> = {
+      userId: id,
+      type: "wearables_sync",
+      status: "ok",
+      detail: { saved, queued: devices },
+      createdAt: now,
+    };
+    await prisma.syncLog.create({
+      data: syncData,
+    });
+
     return NextResponse.json({ ok: true, saved, devices } as WearableSyncRes);
   } catch (e: unknown) {
     const status = (e as FetchError)?.status === 401 ? 401 : 500;
